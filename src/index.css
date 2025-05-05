@@ -1,3 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply font-sans;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.typewriter {
+    display: inline-block;
+    animation: typewriter 2.5s steps(60, end) forwards;
+    overflow: hidden;
+    white-space: normal;
+    max-width: 100%;
+  }
+  
+  @keyframes typewriter {
+    0% {
+      max-height: 0;
+      opacity: 0;
+    }
+    1% {
+      opacity: 1;
+    }
+    100% {
+      max-height: 1000px;
+    }
+  }
+  
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes stampIn {
+    0% {
+      transform: scale(2) rotate(0deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.1) rotate(10deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(12deg);
+      opacity: 0;
+    }
+  }
+  
+  .animate-stamp {
+    animation: stampIn 1.2s ease-out forwards;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 1px 1px 0 #fff;
+    border: 3px solid currentColor;
+    padding: 0.25em 0.6em;
+    border-radius: 0.25rem;
+  }
+  
+  
