@@ -1,32 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchRandomQuote } from "./utils/fetchQuote";
 import { Quote } from "./types/Quote";
 import { QuoteCard } from "./components/QuoteCard";
 import { Favorites } from "./components/Favorites";
 
 function App() {
-  const [quote, setQuote] = useState<Quote>({ content: "", author: "" });
-
-  const loadQuote = async () => {
-    try {
-      const q = await fetchRandomQuote();
-      console.log("Fetched quote:", q); // 🔍 DEBUG
-      setQuote(q);
-    } catch (err) {
-      console.error("Quote fetch error:", err);
-    }
-  };
-
+  const [quote, setQuote] = useState<Quote | null>(null);
   const [favorites, setFavorites] = useState<Quote[]>(() => {
     const saved = localStorage.getItem("favorites");
     return saved ? JSON.parse(saved) : [];
   });
 
-  useEffect(() => {
-    loadQuote();
-  }, []);
+  // 🧠 Called when "Get me a quote!" is clicked
+  const loadQuote = async () => {
+    const q = await fetchRandomQuote();
+    setQuote(q);
+  };
 
   const handleSave = () => {
+    if (!quote) return;
     const updated = [...favorites, quote];
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
@@ -40,6 +32,7 @@ function App() {
   };
 
   const handleShare = () => {
+    if (!quote) return;
     const tweetText = `${quote.content} — ${quote.author}`;
     const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       tweetText
@@ -48,14 +41,40 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <QuoteCard
-        quote={quote}
-        onNewQuote={loadQuote}
-        onSave={handleSave}
-        onShare={handleShare}
-      />
+    <div className="min-h-screen flex flex-col items-center justify-between bg-gray-100 pt-10 px-4">
+      {/* 🔥 HERO TITLE */}
+      <div className="text-center mb-6">
+        <h1 className="text-4xl font-bold text-gray-800 mb-4">
+          📜 InspiroQuote
+        </h1>
+
+        {!quote && (
+          <button
+            onClick={loadQuote}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow"
+          >
+            Get me a quote!
+          </button>
+        )}
+      </div>
+
+      {/* 🎯 Show quote card only if quote exists */}
+      {quote && (
+        <QuoteCard
+          quote={quote}
+          onNewQuote={loadQuote}
+          onSave={handleSave}
+          onShare={handleShare}
+        />
+      )}
+
+      {/* 💾 Saved quotes always shown under */}
       <Favorites quotes={favorites} onRemove={handleRemove} />
+
+      {/* ⚓️ Footer */}
+      <footer className="mt-10 text-center text-sm text-gray-400 py-4">
+        &copy; {new Date().getFullYear()} AVDev
+      </footer>
     </div>
   );
 }
