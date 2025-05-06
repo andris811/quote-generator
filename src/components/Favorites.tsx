@@ -1,4 +1,6 @@
 import { Quote } from "../types/Quote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
 
 type Props = {
   quotes: Quote[];
@@ -6,24 +8,50 @@ type Props = {
 };
 
 export const Favorites = ({ quotes, onRemove }: Props) => {
+  if (quotes.length === 0) return null;
+
   return (
-    <div className="bg-white p-6 mt-6 rounded shadow max-w-xl mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Saved Quotes</h2>
-      {quotes.length === 0 && <p className="text-gray-500">No saved quotes yet.</p>}
-      <ul className="space-y-4">
-        {quotes.map((q, i) => (
-          <li key={i} className="border-b pb-2">
-            <p className="italic">"{q.content}"</p>
-            <p className="text-sm text-gray-600 mb-1">— {q.author}</p>
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-2 text-2xl font-bold text-gray-700 mb-4">
+        <BookmarksIcon className="text-gray-500" />
+        Saved Quotes
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {quotes.map((q, idx) => (
+          <div
+            key={idx}
+            className="relative p-4 bg-white border border-gray-200 rounded-xl shadow-sm font-serif text-sm hover:shadow-md transition"
+          >
             <button
-              className="text-sm text-red-500 hover:underline"
-              onClick={() => onRemove(i)}
+              onClick={() => onRemove(idx)}
+              className="absolute bottom-2 left-2 text-gray-500 hover:text-red-800"
+              title="Remove"
             >
-              Remove
+              <DeleteIcon fontSize="small" />
             </button>
-          </li>
+
+            <p className="italic mb-2 text-gray-800">"{q.content}"</p>
+
+            {q.tags && q.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-1">
+                {q.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <p className="text-right font-semibold text-gray-600">
+              — {q.author}
+            </p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

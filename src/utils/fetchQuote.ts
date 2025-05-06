@@ -1,11 +1,24 @@
-import { Quote } from "../types/Quote";
+const BASE_URL = "https://quoteslate.vercel.app/api/quotes";
 
-export async function fetchRandomQuote(): Promise<Quote> {
-  const res = await fetch("https://dummyjson.com/quotes/random");
+type QuoteApiResponse = {
+  quote: string;
+  author: string;
+  tags?: string[];
+};
+
+export async function fetchRandomQuote(category?: string) {
+  const url = category
+    ? `${BASE_URL}/random?tags=${category}`
+    : `${BASE_URL}/random`;
+
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch quote");
-  const data = await res.json();
+
+  const data: QuoteApiResponse = await res.json();
+
   return {
     content: data.quote,
     author: data.author,
+    tags: data.tags,
   };
 }

@@ -19,31 +19,32 @@ export const QuoteCard = ({ quote, onNewQuote, onSave, onShare }: Props) => {
   }, [quote]);
 
   return (
-    <div
-      className="relative max-w-xl mx-auto p-6 font-serif text-center rounded-lg overflow-hidden"
-      style={{
-        backgroundImage: "url('/parchment.png')",
-        backgroundSize: "cover",
-        backgroundRepeat: "repeat",
-        backgroundColor: "#fef3c7",
-        backgroundBlendMode: "multiply",
-        boxShadow:
-          "0 8px 20px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.6), inset 0 -2px 4px rgba(0,0,0,0.1)",
-        border: "1px solid #e0c080",
-      }}
-    >
+    <div className="relative max-w-xl mx-auto p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition text-center font-serif">
       <p className="text-xl italic mb-4 min-h-[100px]">
         "
         {showText && (
-          <Typewriter
-            words={[quote.content]}
-            cursor
-            typeSpeed={30}
-          />
+          <Typewriter words={[quote.content]} cursor typeSpeed={30} />
         )}
         "
       </p>
-      <p className={`font-semibold mb-6 ${showText ? "opacity-100" : "opacity-0 transition-opacity duration-500"}`}>
+      {quote.tags && quote.tags.length > 0 && (
+        <div className="flex justify-center gap-2 mb-2 flex-wrap">
+          {quote.tags.map((tag, i) => (
+            <span
+              key={i}
+              className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <p
+        className={`font-semibold mb-6 ${
+          showText ? "opacity-100" : "opacity-0 transition-opacity duration-500"
+        }`}
+      >
         — {quote.author}
       </p>
 

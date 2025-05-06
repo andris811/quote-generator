@@ -62,7 +62,7 @@ body {
   }
   
   .animate-stamp {
-    animation: stampIn 1.2s ease-out forwards;
+    animation: stampIn 1.9s ease-out forwards;
     pointer-events: none;
     user-select: none;
     text-shadow: 1px 1px 0 #fff;
