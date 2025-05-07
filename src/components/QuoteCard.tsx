@@ -4,23 +4,20 @@ import { Typewriter } from "react-simple-typewriter";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import TwitterIcon from "@mui/icons-material/X";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 type Props = {
   quote: Quote;
-  onNewQuote: () => void;
   onSave: () => void;
   onShare: () => void;
   isSaved: boolean;
 };
 
-export const QuoteCard = ({
-  quote,
-  onNewQuote,
-  onSave,
-  onShare,
-  isSaved,
-}: Props) => {
+
+export const QuoteCard = ({ quote, onSave, onShare, isSaved }: Props) => {
   const [showText, setShowText] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setShowText(false);
@@ -72,19 +69,45 @@ export const QuoteCard = ({
         — {quote.author}
       </p>
 
-      <div className="flex justify-center gap-4 mt-4">
+      <div className="flex justify-end gap-3 mt-4">
         <button
-          onClick={onNewQuote}
-          className="px-4 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded"
+          onClick={() => {
+            const url = `https://www.facebook.com/sharer/sharer.php?u=https://yourdomain.com&quote=${encodeURIComponent(
+              quote.content + " — " + quote.author
+            )}`;
+            window.open(url, "_blank");
+          }}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition"
         >
-          New Quote
+          <FacebookIcon fontSize="small" />
+          Share
         </button>
+
         <button
           onClick={onShare}
           className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition"
         >
           <TwitterIcon fontSize="small" />
           Share
+        </button>
+
+        <button
+          onClick={() => {
+            const text = `"${quote.content}" — ${quote.author}`;
+            navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition relative"
+        >
+          <ContentCopyIcon fontSize="small" />
+          Copy
+          {/* ✅ Feedback label */}
+          {copied && (
+            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-green-600 font-medium">
+              Copied!
+            </span>
+          )}
         </button>
       </div>
     </div>

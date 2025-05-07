@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { fetchRandomQuote } from "./utils/fetchQuote";
 import { Quote } from "./types/Quote";
@@ -27,6 +27,23 @@ function App() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      setLoading(true);
+      try {
+        const q = await fetchRandomQuote(selectedCategory || undefined);
+        setQuote(q);
+      } catch (err) {
+        console.error("Failed to fetch quote:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuote();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = () => {
     if (!quote) return;
@@ -62,67 +79,22 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <main className="flex-grow">
-        {/* Hero */}
-        <div className="text-center pt-24 pb-10 px-4">
-          {/* Title with inline icon */}
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <FormatQuoteIcon fontSize="large" className="text-gray-500" />
+        {/* Header Section */}
+        <div className="text-center pt-28 px-4">
+          {/* Title */}
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <FormatQuoteIcon fontSize="large" className="text-gray-400" />
             <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight">
               QuoteLift
             </h1>
           </div>
-          <p className="text-gray-500 text-sm mb-8">
+          <p className="text-gray-500 text-sm mb-14">
             Random quotes to inspire your day
           </p>
-
-          {/* Flex container for selector + button */}
-          <div className="flex flex-col items-center gap-6">
-            {/* Category Selector */}
-            <div className="bg-white/70 backdrop-blur-md border border-gray-200 rounded-xl px-6 py-4 shadow-md">
-              <p className="text-gray-700 font-medium mb-2">
-                Choose a category
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {["inspiration", "wisdom", "life", "love"].map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedCategory(tag)}
-                    disabled={loading}
-                    className={`px-4 py-1 rounded-full border text-sm font-medium capitalize transition ${
-                      selectedCategory === tag
-                        ? "bg-zinc-700 text-white"
-                        : "bg-white text-gray-700 hover:bg-gray-200"
-                    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  disabled={loading}
-                  className={`px-4 py-1 rounded-full border text-sm font-medium transition bg-gray-300 text-black hover:bg-gray-400 ${
-                    selectedCategory === null ? "ring-2 ring-gray-600" : ""
-                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  Random
-                </button>
-              </div>
-            </div>
-
-            {/* Get Quote Button */}
-            {!quote && (
-              <button
-                onClick={loadQuote}
-                className="bg-zinc-700 hover:bg-zinc-800 text-white font-semibold py-2 px-6 rounded shadow transition"
-              >
-                Get me a quote!
-              </button>
-            )}
-          </div>
         </div>
 
-        {/* QuoteCard */}
-        <div className="flex justify-center min-h-[220px] transition-all duration-300 px-4">
+        {/* Quote Section */}
+        <div className="flex justify-center transition-all duration-300 px-4 mb-16">
           {loading ? (
             <div className="w-full max-w-xl flex justify-center items-center py-10">
               <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-opacity-60"></div>
@@ -136,7 +108,6 @@ function App() {
               )}
               <QuoteCard
                 quote={quote}
-                onNewQuote={loadQuote}
                 onSave={handleSave}
                 onShare={handleShare}
                 isSaved={favorites.some(
@@ -148,7 +119,97 @@ function App() {
           ) : null}
         </div>
 
-        {/* Favorites */}
+        {/* Category & Button Section */}
+        <div className="flex justify-center mb-20 px-4">
+          <div className="inline-block bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl px-6 py-6 shadow-md max-w-3xl w-full">
+            <p className="text-gray-700 font-medium mb-4 text-center">
+              Choose a category
+            </p>
+
+            {/* Tags and Dropdown */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {["inspiration", "motivation", "life", "love"].map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedCategory(tag)}
+                  disabled={loading}
+                  className={`px-4 py-1 rounded-full border text-sm font-medium capitalize transition ${
+                    selectedCategory === tag
+                      ? "bg-neutral-800 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-200"
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {tag}
+                </button>
+              ))}
+
+              <select
+                value={selectedCategory || ""}
+                onChange={(e) => setSelectedCategory(e.target.value || null)}
+                disabled={loading}
+                className="px-4 py-1 rounded-full border text-sm bg-white text-gray-700 hover:bg-gray-100 transition"
+              >
+                <option value="">More categories</option>
+                {[
+                  "wisdom",
+                  "success",
+                  "leadership",
+                  "happiness",
+                  "change",
+                  "perseverance",
+                  "mindfulness",
+                  "growth",
+                  "courage",
+                  "gratitude",
+                  "resilience",
+                  "friendship",
+                  "creativity",
+                  "humility",
+                  "forgiveness",
+                  "patience",
+                  "integrity",
+                  "self-reflection",
+                  "empathy",
+                  "purpose",
+                  "justice",
+                  "harmony",
+                  "knowledge",
+                  "hope",
+                  "anger",
+                  "fear",
+                  "general",
+                ].map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={() => setSelectedCategory(null)}
+                disabled={loading}
+                className={`px-4 py-1 rounded-full border text-sm font-medium transition bg-gray-200 text-black hover:bg-gray-300 ${
+                  selectedCategory === null ? "ring-2 ring-gray-500" : ""
+                } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                Random
+              </button>
+            </div>
+
+            {/* New Quote Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={loadQuote}
+                disabled={loading}
+                className="bg-zinc-700 hover:bg-zinc-800 text-white font-semibold py-2 px-6 rounded shadow transition disabled:opacity-50"
+              >
+                New Quote
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Favorites Section */}
         <div className="px-4 mt-10">
           <Favorites quotes={favorites} onRemove={handleRemove} />
         </div>
