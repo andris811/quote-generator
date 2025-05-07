@@ -4,6 +4,7 @@ type QuoteApiResponse = {
   quote: string;
   author: string;
   tags?: string[];
+  id: string | number;
 };
 
 export async function fetchRandomQuote(category?: string) {
@@ -20,5 +21,6 @@ export async function fetchRandomQuote(category?: string) {
     content: data.quote,
     author: data.author,
     tags: data.tags,
+    id: data.id,
   };
 }

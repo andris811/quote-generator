@@ -1,6 +1,7 @@
 export interface Quote {
-    content: string;
-    author: string;
-    tags?: string[];
-  }
-  
+  id: string | number; // Unique and stable
+  content: string;
+  author: string;
+  tags?: string[];
+  pinned?: boolean;
+}

@@ -20,7 +20,7 @@ function App() {
     setLoading(true);
     try {
       const q = await fetchRandomQuote(selectedCategory || undefined);
-      setQuote(q);
+      setQuote(q); // ✅ Already includes ID from API
     } catch (err) {
       console.error("Failed to fetch quote:", err);
     } finally {
@@ -28,29 +28,16 @@ function App() {
     }
   };
 
+  // Load initial quote
   useEffect(() => {
-    const fetchQuote = async () => {
-      setLoading(true);
-      try {
-        const q = await fetchRandomQuote(selectedCategory || undefined);
-        setQuote(q);
-      } catch (err) {
-        console.error("Failed to fetch quote:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuote();
+    loadQuote();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = () => {
     if (!quote) return;
 
-    const exists = favorites.some(
-      (fav) => fav.content === quote.content && fav.author === quote.author
-    );
+    const exists = favorites.some((fav) => fav.id === quote.id);
     if (exists) return;
 
     const updated = [...favorites, quote];
@@ -60,9 +47,8 @@ function App() {
     setTimeout(() => setShowStamp(false), 1500);
   };
 
-  const handleRemove = (index: number) => {
-    const updated = [...favorites];
-    updated.splice(index, 1);
+  const handleRemove = (id: string | number) => {
+    const updated = favorites.filter((q) => q.id !== id);
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
   };
@@ -79,9 +65,8 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <main className="flex-grow">
-        {/* Header Section */}
+        {/* Header */}
         <div className="text-center pt-28 px-4">
-          {/* Title */}
           <div className="flex items-center justify-center gap-3 mb-2">
             <FormatQuoteIcon fontSize="large" className="text-gray-400" />
             <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight">
@@ -93,7 +78,7 @@ function App() {
           </p>
         </div>
 
-        {/* Quote Section */}
+        {/* QuoteCard */}
         <div className="flex justify-center transition-all duration-300 px-4 mb-16">
           {loading ? (
             <div className="w-full max-w-xl flex justify-center items-center py-10">
@@ -110,23 +95,19 @@ function App() {
                 quote={quote}
                 onSave={handleSave}
                 onShare={handleShare}
-                isSaved={favorites.some(
-                  (f) =>
-                    f.content === quote.content && f.author === quote.author
-                )}
+                isSaved={favorites.some((f) => f.id === quote.id)}
               />
             </div>
           ) : null}
         </div>
 
-        {/* Category & Button Section */}
+        {/* Category and Button Section */}
         <div className="flex justify-center mb-20 px-4">
           <div className="inline-block bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl px-6 py-6 shadow-md max-w-3xl w-full">
             <p className="text-gray-700 font-medium mb-4 text-center">
               Choose a category
             </p>
 
-            {/* Tags and Dropdown */}
             <div className="flex flex-wrap justify-center gap-2 mb-4">
               {["inspiration", "motivation", "life", "love"].map((tag) => (
                 <button
@@ -196,7 +177,6 @@ function App() {
               </button>
             </div>
 
-            {/* New Quote Button */}
             <div className="flex justify-center">
               <button
                 onClick={loadQuote}
@@ -209,7 +189,7 @@ function App() {
           </div>
         </div>
 
-        {/* Favorites Section */}
+        {/* Favorites */}
         <div className="px-4 mt-10">
           <Favorites quotes={favorites} onRemove={handleRemove} />
         </div>
