@@ -1,5 +1,5 @@
 export interface Quote {
-  id: string | number; // Unique and stable
+  id: string | number;
   content: string;
   author: string;
   tags?: string[];

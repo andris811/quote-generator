@@ -20,7 +20,7 @@ function App() {
     setLoading(true);
     try {
       const q = await fetchRandomQuote(selectedCategory || undefined);
-      setQuote(q); // ✅ Already includes ID from API
+      setQuote(q);
     } catch (err) {
       console.error("Failed to fetch quote:", err);
     } finally {

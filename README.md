@@ -11,7 +11,7 @@ A simple, responsive quote generator app built with **React**, **TypeScript**, *
 - 📝 Fetch a random quote from a public API
 - ⭐ Save quotes to localStorage as favorites
 - 🗑️ Remove saved quotes
-- 📤 Share quotes to Twitter
+- 📤 Share quotes to Twitter, Facebook
 - 📱 Fully responsive layout with Tailwind
 
 ---
