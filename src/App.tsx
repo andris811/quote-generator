@@ -68,7 +68,7 @@ function App() {
           <div className="flex items-center justify-center gap-3 mb-3">
             <FormatQuoteIcon fontSize="large" className="text-gray-500" />
             <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight">
-              InspiroQuote
+              QuoteLift
             </h1>
           </div>
           <p className="text-gray-500 text-sm mb-8">
@@ -104,7 +104,7 @@ function App() {
                     selectedCategory === null ? "ring-2 ring-gray-600" : ""
                   } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
-                  Totally Random
+                  Random
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-# 🧠 Quote Generator
+# 🧠 QuoteLift
 
 A simple, responsive quote generator app built with **React**, **TypeScript**, **Tailwind CSS**, and **Vite**. It fetches random quotes, allows users to save favorites (in `localStorage`), and share quotes to X (Twitter).
 
