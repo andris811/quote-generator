@@ -1,15 +1,25 @@
 import { useEffect, useState } from "react";
 import { Quote } from "../types/Quote";
 import { Typewriter } from "react-simple-typewriter";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import TwitterIcon from "@mui/icons-material/X";
 
 type Props = {
   quote: Quote;
   onNewQuote: () => void;
   onSave: () => void;
   onShare: () => void;
+  isSaved: boolean;
 };
 
-export const QuoteCard = ({ quote, onNewQuote, onSave, onShare }: Props) => {
+export const QuoteCard = ({
+  quote,
+  onNewQuote,
+  onSave,
+  onShare,
+  isSaved,
+}: Props) => {
   const [showText, setShowText] = useState(false);
 
   useEffect(() => {
@@ -19,7 +29,20 @@ export const QuoteCard = ({ quote, onNewQuote, onSave, onShare }: Props) => {
   }, [quote]);
 
   return (
-    <div className="relative max-w-xl mx-auto p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition text-center font-serif">
+    <div className="relative max-w-xl mx-auto p-6 pt-12 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition text-center font-serif">
+      {/* ❤️ Save button (moved to safe area) */}
+      <button
+        onClick={onSave}
+        className="absolute top-3 right-4 text-red-500 hover:text-red-700 transition"
+        title="Save to Favorites"
+      >
+        {isSaved ? (
+          <FavoriteIcon fontSize="medium" />
+        ) : (
+          <FavoriteBorderIcon fontSize="medium" />
+        )}
+      </button>
+
       <p className="text-xl italic mb-4 min-h-[100px]">
         "
         {showText && (
@@ -27,6 +50,7 @@ export const QuoteCard = ({ quote, onNewQuote, onSave, onShare }: Props) => {
         )}
         "
       </p>
+
       {quote.tags && quote.tags.length > 0 && (
         <div className="flex justify-center gap-2 mb-2 flex-wrap">
           {quote.tags.map((tag, i) => (
@@ -56,16 +80,11 @@ export const QuoteCard = ({ quote, onNewQuote, onSave, onShare }: Props) => {
           New Quote
         </button>
         <button
-          onClick={onSave}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          Save
-        </button>
-        <button
           onClick={onShare}
-          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded hover:bg-gray-200 transition"
         >
-          Share to X
+          <TwitterIcon fontSize="small" />
+          Share
         </button>
       </div>
     </div>

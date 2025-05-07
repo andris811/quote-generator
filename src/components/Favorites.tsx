@@ -1,6 +1,7 @@
 import { Quote } from "../types/Quote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import TwitterIcon from "@mui/icons-material/X";
 
 type Props = {
   quotes: Quote[];
@@ -21,18 +22,12 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
         {quotes.map((q, idx) => (
           <div
             key={idx}
-            className="relative p-4 bg-white border border-gray-200 rounded-xl shadow-sm font-serif text-sm hover:shadow-md transition"
+            className="relative p-4 pb-8 bg-white border border-gray-200 rounded-xl shadow-sm font-serif text-sm hover:shadow-md transition"
           >
-            <button
-              onClick={() => onRemove(idx)}
-              className="absolute bottom-2 left-2 text-gray-500 hover:text-red-800"
-              title="Remove"
-            >
-              <DeleteIcon fontSize="small" />
-            </button>
-
+            {/* ✅ Quote */}
             <p className="italic mb-2 text-gray-800">"{q.content}"</p>
 
+            {/* ✅ Tags */}
             {q.tags && q.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-1">
                 {q.tags.map((tag, i) => (
@@ -46,9 +41,34 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
               </div>
             )}
 
+            {/* ✅ Author */}
             <p className="text-right font-semibold text-gray-600">
               — {q.author}
             </p>
+
+            {/* ✅ Button Row (bottom-left corner) */}
+            <div className="absolute bottom-2 left-2 flex items-center gap-2">
+              <button
+                onClick={() => onRemove(idx)}
+                className="text-gray-500 hover:text-red-800"
+                title="Remove"
+              >
+                <DeleteIcon fontSize="small" />
+              </button>
+              <button
+                onClick={() => {
+                  const tweetText = `${q.content} — ${q.author}`;
+                  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                    tweetText
+                  )}`;
+                  window.open(tweetUrl, "_blank");
+                }}
+                className="text-gray-500 hover:text-blue-700"
+                title="Share to X"
+              >
+                <TwitterIcon fontSize="small" />
+              </button>
+            </div>
           </div>
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { fetchRandomQuote } from "./utils/fetchQuote";
 import { Quote } from "./types/Quote";
 import { QuoteCard } from "./components/QuoteCard";
@@ -29,6 +30,12 @@ function App() {
 
   const handleSave = () => {
     if (!quote) return;
+
+    const exists = favorites.some(
+      (fav) => fav.content === quote.content && fav.author === quote.author
+    );
+    if (exists) return;
+
     const updated = [...favorites, quote];
     setFavorites(updated);
     localStorage.setItem("favorites", JSON.stringify(updated));
@@ -46,7 +53,9 @@ function App() {
   const handleShare = () => {
     if (!quote) return;
     const tweetText = `${quote.content} — ${quote.author}`;
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      tweetText
+    )}`;
     window.open(tweetUrl, "_blank");
   };
 
@@ -55,42 +64,61 @@ function App() {
       <main className="flex-grow">
         {/* Hero */}
         <div className="text-center pt-24 pb-10 px-4">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 font-sans">
-            📜 InspiroQuote
-          </h1>
-
-          {/* Category Buttons */}
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
-            {["inspiration", "wisdom", "life", "love"].map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setSelectedCategory(tag)}
-                className={`px-4 py-1 rounded-full border text-sm font-medium capitalize transition ${
-                  selectedCategory === tag
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
-            <button
-              onClick={() => setSelectedCategory(null)}
-              className="px-4 py-1 rounded-full border text-sm font-medium transition bg-yellow-400 text-black hover:bg-yellow-500"
-            >
-              Totally Random
-            </button>
+          {/* Title with inline icon */}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <FormatQuoteIcon fontSize="large" className="text-gray-500" />
+            <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight">
+              InspiroQuote
+            </h1>
           </div>
+          <p className="text-gray-500 text-sm mb-8">
+            Random quotes to inspire your day
+          </p>
 
-          {/* Get Quote Button */}
-          {!quote && (
-            <button
-              onClick={loadQuote}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow"
-            >
-              Get me a quote!
-            </button>
-          )}
+          {/* Flex container for selector + button */}
+          <div className="flex flex-col items-center gap-6">
+            {/* Category Selector */}
+            <div className="bg-white/70 backdrop-blur-md border border-gray-200 rounded-xl px-6 py-4 shadow-md">
+              <p className="text-gray-700 font-medium mb-2">
+                Choose a category
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {["inspiration", "wisdom", "life", "love"].map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedCategory(tag)}
+                    disabled={loading}
+                    className={`px-4 py-1 rounded-full border text-sm font-medium capitalize transition ${
+                      selectedCategory === tag
+                        ? "bg-zinc-700 text-white"
+                        : "bg-white text-gray-700 hover:bg-gray-200"
+                    } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  disabled={loading}
+                  className={`px-4 py-1 rounded-full border text-sm font-medium transition bg-gray-300 text-black hover:bg-gray-400 ${
+                    selectedCategory === null ? "ring-2 ring-gray-600" : ""
+                  } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  Totally Random
+                </button>
+              </div>
+            </div>
+
+            {/* Get Quote Button */}
+            {!quote && (
+              <button
+                onClick={loadQuote}
+                className="bg-zinc-700 hover:bg-zinc-800 text-white font-semibold py-2 px-6 rounded shadow transition"
+              >
+                Get me a quote!
+              </button>
+            )}
+          </div>
         </div>
 
         {/* QuoteCard */}
@@ -111,6 +139,10 @@ function App() {
                 onNewQuote={loadQuote}
                 onSave={handleSave}
                 onShare={handleShare}
+                isSaved={favorites.some(
+                  (f) =>
+                    f.content === quote.content && f.author === quote.author
+                )}
               />
             </div>
           ) : null}
