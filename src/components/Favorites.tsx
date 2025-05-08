@@ -7,6 +7,8 @@ import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import * as quoteService from "../services/quoteService";
+
 import {
   Dialog,
   DialogActions,
@@ -138,13 +140,24 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 </button>
 
                 <button
-                  onClick={() => {
-                    const isPinned = pinnedIds.includes(String(q.id));
-                    setPinnedIds((prev) =>
-                      isPinned
-                        ? prev.filter((id) => id !== String(q.id))
-                        : [...prev, String(q.id)]
-                    );
+                  onClick={async () => {
+                    try {
+                      const updatedQuote = await quoteService.togglePin(
+                        String(q.id)
+                      );
+                      setPinnedIds((prev) =>
+                        updatedQuote.pinned
+                          ? [...prev, String(q.id)]
+                          : prev.filter((id) => id !== String(q.id))
+                      );
+                    } catch {
+                      const alreadyPinned = pinnedIds.includes(String(q.id));
+                      setPinnedIds((prev) =>
+                        alreadyPinned
+                          ? prev.filter((id) => id !== String(q.id))
+                          : [...prev, String(q.id)]
+                      );
+                    }
                   }}
                   className="text-gray-500 hover:text-yellow-600"
                   title="Pin to Top"

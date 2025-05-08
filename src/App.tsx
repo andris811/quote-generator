@@ -1,22 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import { fetchRandomQuote } from "./utils/fetchQuote";
 import { Quote } from "./types/Quote";
 import { QuoteCard } from "./components/QuoteCard";
 import { Favorites } from "./components/Favorites";
 import Footer from "./components/Footer";
+import * as quoteService from "./services/quoteService";
 
 function App() {
   const [quote, setQuote] = useState<Quote | null>(null);
-  const [favorites, setFavorites] = useState<Quote[]>(() => {
-    const saved = localStorage.getItem("favorites");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [favorites, setFavorites] = useState<Quote[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showStamp, setShowStamp] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadQuote = async () => {
+  const loadQuote = useCallback(async () => {
     setLoading(true);
     try {
       const q = await fetchRandomQuote(selectedCategory || undefined);
@@ -26,31 +24,63 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
 
-  // Load initial quote
   useEffect(() => {
-    loadQuote();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadFavorites = async () => {
+      try {
+        const saved = await quoteService.getSavedQuotes();
+        setFavorites(saved);
+      } catch (err) {
+        console.warn("Backend unavailable, falling back to localStorage.");
+        console.error(err);
+        const local = localStorage.getItem("favorites");
+        setFavorites(local ? JSON.parse(local) : []);
+      }
+    };
+
+    loadFavorites();
   }, []);
 
-  const handleSave = () => {
+  useEffect(() => {
+    // Load quote only once on mount, regardless of category
+    fetchRandomQuote()
+      .then(setQuote)
+      .catch((err) => console.error("Initial quote load failed:", err));
+  }, []);
+
+  const handleSave = async () => {
     if (!quote) return;
-
-    const exists = favorites.some((fav) => fav.id === quote.id);
+  
+    const exists = favorites.some((fav) => fav.content === quote.content && fav.author === quote.author);
     if (exists) return;
-
-    const updated = [...favorites, quote];
-    setFavorites(updated);
-    localStorage.setItem("favorites", JSON.stringify(updated));
+  
+    try {
+      const saved = await quoteService.saveQuote(quote);
+      const updated = [...favorites, saved];
+      setFavorites(updated);
+      setQuote(saved); // ✅ update quote to use backend ID
+    } catch {
+      // fallback for localStorage
+      const updated = [...favorites, quote];
+      setFavorites(updated);
+      localStorage.setItem("favorites", JSON.stringify(updated));
+    }
+  
     setShowStamp(true);
     setTimeout(() => setShowStamp(false), 1500);
   };
+  
 
-  const handleRemove = (id: string | number) => {
+  const handleRemove = async (id: string | number) => {
     const updated = favorites.filter((q) => q.id !== id);
     setFavorites(updated);
-    localStorage.setItem("favorites", JSON.stringify(updated));
+
+    try {
+      await quoteService.deleteQuote(String(id));
+    } catch {
+      localStorage.setItem("favorites", JSON.stringify(updated));
+    }
   };
 
   const handleShare = () => {

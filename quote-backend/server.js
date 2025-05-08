@@ -23,7 +23,11 @@ app.use(express.json());
 // ✅ API routes
 app.use("/api/quotes", quoteRoutes);
 
-const PORT = process.env.PORT || 5000;
+app.get("/test", (req, res) => {
+    res.json({ message: "CORS is working!" });
+  });  
+
+const PORT = process.env.PORT || 5050;
 
 mongoose
   .connect(process.env.MONGO_URI)
