@@ -1,7 +1,8 @@
 import axios from "axios";
 import { Quote } from "../types/Quote";
 
-const API_URL = "http://localhost:5050/api/quotes"; // change if deployed
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5050/api/quotes";
 
 // Get all saved quotes
 export const getSavedQuotes = async (): Promise<Quote[]> => {
