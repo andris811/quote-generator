@@ -51,10 +51,12 @@ function App() {
 
   const handleSave = async () => {
     if (!quote) return;
-  
-    const exists = favorites.some((fav) => fav.content === quote.content && fav.author === quote.author);
+
+    const exists = favorites.some(
+      (fav) => fav.content === quote.content && fav.author === quote.author
+    );
     if (exists) return;
-  
+
     try {
       const saved = await quoteService.saveQuote(quote);
       const updated = [...favorites, saved];
@@ -66,11 +68,10 @@ function App() {
       setFavorites(updated);
       localStorage.setItem("favorites", JSON.stringify(updated));
     }
-  
+
     setShowStamp(true);
     setTimeout(() => setShowStamp(false), 1500);
   };
-  
 
   const handleRemove = async (id: string | number) => {
     const updated = favorites.filter((q) => q.id !== id);
@@ -81,15 +82,6 @@ function App() {
     } catch {
       localStorage.setItem("favorites", JSON.stringify(updated));
     }
-  };
-
-  const handleShare = () => {
-    if (!quote) return;
-    const tweetText = `${quote.content} — ${quote.author}`;
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      tweetText
-    )}`;
-    window.open(tweetUrl, "_blank");
   };
 
   return (
@@ -124,7 +116,6 @@ function App() {
               <QuoteCard
                 quote={quote}
                 onSave={handleSave}
-                onShare={handleShare}
                 isSaved={favorites.some((f) => f.id === quote.id)}
               />
             </div>

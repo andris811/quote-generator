@@ -46,7 +46,7 @@ src/
 ```
 
 ## 🌐 API Source
-Quotes are fetched from [dummyjson.com](https://dummyjson.com/quotes/random).
+Quotes are fetched from [QuoteSlate API](https://quoteslate.vercel.app).
 
 ## 📜 License
 MIT — Feel free to use, modify, and share!

@@ -2,13 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Quote } from "../types/Quote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import TwitterIcon from "@mui/icons-material/X";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import FacebookIcon from "@mui/icons-material/Facebook";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/X";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import ShareIcon from "@mui/icons-material/Share";
 import * as quoteService from "../services/quoteService";
-
 import {
   Dialog,
   DialogActions,
@@ -16,6 +17,10 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
+  Menu,
+  MenuItem,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 
 type Props = {
@@ -35,8 +40,25 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
   }, [pinnedIds]);
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [shareQuote, setShareQuote] = useState<Quote | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [quoteToDelete, setQuoteToDelete] = useState<Quote | null>(null);
+
+  const open = Boolean(anchorEl);
+
+  const handleShareClick = (
+    event: React.MouseEvent<HTMLElement>,
+    quote: Quote
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setShareQuote(quote);
+  };
+
+  const handleShareClose = () => {
+    setAnchorEl(null);
+    setShareQuote(null);
+  };
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
@@ -56,17 +78,13 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
     });
   }, [quotes, activeTag, pinnedIds]);
 
-  if (quotes.length === 0) return null;
-
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
       <div className="flex items-center gap-2 text-2xl font-bold text-gray-700 mb-4">
         <BookmarksIcon className="text-gray-500" />
         Saved Quotes
       </div>
 
-      {/* Tag Filter Bar */}
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {allTags.map((tag) => (
@@ -85,7 +103,6 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
         </div>
       )}
 
-      {/* Quote Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedQuotes.map((q) => {
           const isPinned = pinnedIds.includes(String(q.id));
@@ -97,11 +114,9 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 isPinned ? "bg-blue-50" : "bg-white"
               }`}
             >
-              {/* Quote */}
               <p className="italic mb-2 text-gray-800">"{q.content}"</p>
 
-              {/* Tags */}
-              {q.tags && q.tags.length > 0 && (
+              {Array.isArray(q.tags) && q.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-1">
                   {q.tags.map((tag, i) => (
                     <button
@@ -121,106 +136,159 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 </div>
               )}
 
-              {/* Author */}
               <p className="text-right font-semibold text-gray-600">
                 — {q.author}
               </p>
 
-              {/* Button Rows: Left = Delete/Pin, Right = Share/Copy */}
+              {/* Left: Delete & Pin */}
               <div className="absolute bottom-2 left-2 flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    setQuoteToDelete(q);
-                    setOpenDialog(true);
-                  }}
-                  className="text-gray-500 hover:text-red-800"
-                  title="Remove"
-                >
-                  <DeleteIcon fontSize="small" />
-                </button>
+                <Tooltip title="Delete">
+                  <IconButton
+                    onClick={() => {
+                      setQuoteToDelete(q);
+                      setOpenDialog(true);
+                    }}
+                    size="small"
+                  >
+                    <DeleteIcon
+                      fontSize="small"
+                      className="text-gray-500 hover:text-red-800"
+                    />
+                  </IconButton>
+                </Tooltip>
 
-                <button
-                  onClick={async () => {
-                    try {
-                      const updatedQuote = await quoteService.togglePin(
-                        String(q.id)
-                      );
-                      setPinnedIds((prev) =>
-                        updatedQuote.pinned
-                          ? [...prev, String(q.id)]
-                          : prev.filter((id) => id !== String(q.id))
-                      );
-                    } catch {
-                      const alreadyPinned = pinnedIds.includes(String(q.id));
-                      setPinnedIds((prev) =>
-                        alreadyPinned
-                          ? prev.filter((id) => id !== String(q.id))
-                          : [...prev, String(q.id)]
-                      );
-                    }
-                  }}
-                  className="text-gray-500 hover:text-yellow-600"
-                  title="Pin to Top"
-                >
-                  {pinnedIds.includes(String(q.id)) ? (
-                    <PushPinIcon fontSize="small" />
-                  ) : (
-                    <PushPinOutlinedIcon fontSize="small" />
-                  )}
-                </button>
+                <Tooltip title="Pin to Top">
+                  <IconButton
+                    onClick={async () => {
+                      try {
+                        const updatedQuote = await quoteService.togglePin(
+                          String(q.id)
+                        );
+                        setPinnedIds((prev) =>
+                          updatedQuote.pinned
+                            ? [...prev, String(q.id)]
+                            : prev.filter((id) => id !== String(q.id))
+                        );
+                      } catch {
+                        const alreadyPinned = pinnedIds.includes(String(q.id));
+                        setPinnedIds((prev) =>
+                          alreadyPinned
+                            ? prev.filter((id) => id !== String(q.id))
+                            : [...prev, String(q.id)]
+                        );
+                      }
+                    }}
+                    size="small"
+                  >
+                    {isPinned ? (
+                      <PushPinIcon
+                        fontSize="small"
+                        className="text-yellow-600"
+                      />
+                    ) : (
+                      <PushPinOutlinedIcon
+                        fontSize="small"
+                        className="text-gray-500 hover:text-yellow-600"
+                      />
+                    )}
+                  </IconButton>
+                </Tooltip>
               </div>
 
+              {/* Right: Copy & Share */}
               <div className="absolute bottom-2 right-2 flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=https://yourdomain.com&quote=${encodeURIComponent(
-                      `${q.content} — ${q.author}`
-                    )}`;
-                    window.open(fbUrl, "_blank");
-                  }}
-                  className="text-gray-500 hover:text-blue-600"
-                  title="Share to Facebook"
-                >
-                  <FacebookIcon fontSize="small" />
-                </button>
+                <Tooltip title="Copy to Clipboard">
+                  <IconButton
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `"${q.content}" — ${q.author}`
+                      );
+                      setCopiedId(String(q.id));
+                      setTimeout(() => setCopiedId(null), 1500);
+                    }}
+                    size="small"
+                    className="relative"
+                  >
+                    <ContentCopyIcon
+                      fontSize="small"
+                      className="text-gray-500 hover:text-green-600"
+                    />
+                    {copiedId === String(q.id) && (
+                      <span className="absolute -top-6 right-0 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded shadow">
+                        Copied!
+                      </span>
+                    )}
+                  </IconButton>
+                </Tooltip>
 
-                <button
-                  onClick={() => {
-                    const tweetText = `${q.content} — ${q.author}`;
-                    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                      tweetText
-                    )}`;
-                    window.open(tweetUrl, "_blank");
-                  }}
-                  className="text-gray-500 hover:text-blue-700"
-                  title="Share to X"
-                >
-                  <TwitterIcon fontSize="small" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `"${q.content}" — ${q.author}`
-                    );
-                    setCopiedId(String(q.id));
-                    setTimeout(() => setCopiedId(null), 1500);
-                  }}
-                  className="relative text-gray-500 hover:text-green-600"
-                  title="Copy to Clipboard"
-                >
-                  <ContentCopyIcon fontSize="small" />
-                  {copiedId === String(q.id) && (
-                    <span className="absolute -top-6 right-0 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded shadow">
-                      Copied!
-                    </span>
-                  )}
-                </button>
+                <Tooltip title="Share">
+                  <IconButton
+                    onClick={(e) => handleShareClick(e, q)}
+                    size="small"
+                  >
+                    <ShareIcon
+                      fontSize="small"
+                      className="text-gray-500 hover:text-blue-600"
+                    />
+                  </IconButton>
+                </Tooltip>
               </div>
             </div>
           );
         })}
       </div>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleShareClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <MenuItem
+          onClick={() => {
+            if (!shareQuote) return;
+            const url = `https://www.facebook.com/sharer/sharer.php?u=https://yourdomain.com&quote=${encodeURIComponent(
+              `${shareQuote.content} — ${shareQuote.author}`
+            )}`;
+            window.open(url, "_blank");
+            handleShareClose();
+          }}
+        >
+          <FacebookIcon fontSize="small" className="mr-2 text-blue-600" />
+          Facebook
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            if (!shareQuote) return;
+            const text = `${shareQuote.content} — ${shareQuote.author}`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              text
+            )}`;
+            window.open(url, "_blank");
+            handleShareClose();
+          }}
+        >
+          <TwitterIcon fontSize="small" className="mr-2" />X
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            if (!shareQuote) return;
+            const text = `${shareQuote.content} — ${shareQuote.author}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+              text
+            )}`;
+            window.open(url, "_blank");
+            handleShareClose();
+          }}
+        >
+          <WhatsAppIcon fontSize="small" className="mr-2 text-green-600" />
+          WhatsApp
+        </MenuItem>
+      </Menu>
+
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
