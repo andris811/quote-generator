@@ -8,12 +8,14 @@ import Footer from "./components/Footer";
 import * as quoteService from "./services/quoteService";
 
 function App() {
+  // ✅ State management
   const [quote, setQuote] = useState<Quote | null>(null);
   const [favorites, setFavorites] = useState<Quote[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showStamp, setShowStamp] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Fetch a new random quote from API (or by category)
   const loadQuote = useCallback(async () => {
     setLoading(true);
     try {
@@ -26,6 +28,7 @@ function App() {
     }
   }, [selectedCategory]);
 
+  // ✅ Load saved quotes from backend or fallback to localStorage
   useEffect(() => {
     const loadFavorites = async () => {
       try {
@@ -42,13 +45,14 @@ function App() {
     loadFavorites();
   }, []);
 
+  // ✅ Load one quote on initial mount
   useEffect(() => {
-    // Load quote only once on mount, regardless of category
     fetchRandomQuote()
       .then(setQuote)
       .catch((err) => console.error("Initial quote load failed:", err));
   }, []);
 
+  // ✅ Save quote to backend (or localStorage fallback)
   const handleSave = async () => {
     if (!quote) return;
 
@@ -61,7 +65,7 @@ function App() {
       const saved = await quoteService.saveQuote(quote);
       const updated = [...favorites, saved];
       setFavorites(updated);
-      setQuote(saved); // ✅ update quote to use backend ID
+      setQuote(saved); // ✅ use backend-generated ID
     } catch {
       // fallback for localStorage
       const updated = [...favorites, quote];
@@ -73,6 +77,7 @@ function App() {
     setTimeout(() => setShowStamp(false), 1500);
   };
 
+  // ✅ Remove quote from favorites (backend or fallback)
   const handleRemove = async (id: string | number) => {
     const updated = favorites.filter((q) => q.id !== id);
     setFavorites(updated);
@@ -87,7 +92,7 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <main className="flex-grow">
-        {/* Header */}
+        {/* ✅ Header */}
         <div className="text-center pt-28 px-4">
           <div className="flex items-center justify-center gap-3 mb-2">
             <FormatQuoteIcon fontSize="large" className="text-gray-400" />
@@ -100,7 +105,7 @@ function App() {
           </p>
         </div>
 
-        {/* QuoteCard */}
+        {/* ✅ Quote Display */}
         <div className="flex justify-center transition-all duration-300 px-4 mb-16">
           {loading ? (
             <div className="w-full max-w-xl flex justify-center items-center py-10">
@@ -122,13 +127,14 @@ function App() {
           ) : null}
         </div>
 
-        {/* Category and Button Section */}
+        {/* ✅ Category Selector + New Quote Button */}
         <div className="flex justify-center mb-20 px-4">
           <div className="inline-block bg-white/70 backdrop-blur-md border border-gray-300 rounded-xl px-6 py-6 shadow-md max-w-3xl w-full">
             <p className="text-gray-700 font-medium mb-4 text-center">
               Choose a category
             </p>
 
+            {/* Category buttons */}
             <div className="flex flex-wrap justify-center gap-2 mb-4">
               {["inspiration", "motivation", "life", "love"].map((tag) => (
                 <button
@@ -145,6 +151,7 @@ function App() {
                 </button>
               ))}
 
+              {/* Dropdown selector */}
               <select
                 value={selectedCategory || ""}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
@@ -198,6 +205,7 @@ function App() {
               </button>
             </div>
 
+            {/* ✅ Trigger New Quote */}
             <div className="flex justify-center">
               <button
                 onClick={loadQuote}
@@ -210,7 +218,7 @@ function App() {
           </div>
         </div>
 
-        {/* Favorites */}
+        {/* ✅ Favorites Section */}
         <div className="px-4 mt-10">
           <Favorites quotes={favorites} onRemove={handleRemove} />
         </div>

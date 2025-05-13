@@ -1,3 +1,4 @@
+// ✅ Imports
 import { useEffect, useState } from "react";
 import { Quote } from "../types/Quote";
 import { Typewriter } from "react-simple-typewriter";
@@ -15,38 +16,44 @@ import {
   Tooltip
 } from "@mui/material";
 
+// ✅ Component Props
 type Props = {
   quote: Quote;
   onSave: () => void;
   isSaved: boolean;
 };
 
-
 export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
+  // ✅ State for typewriter, clipboard feedback, and share menu
   const [showText, setShowText] = useState(false);
   const [copied, setCopied] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  // ✅ Animate quote text on quote change
   useEffect(() => {
     setShowText(false);
     const timer = setTimeout(() => setShowText(true), 100);
     return () => clearTimeout(timer);
   }, [quote]);
 
+  // ✅ Handle Share Menu Open
   const handleMenuOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
   };
 
+  // ✅ Handle Share Menu Close
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
+  // ✅ Prepares text and dummy URL for sharing
   const shareUrl = `https://yourdomain.com`;
   const quoteText = `"${quote.content}" — ${quote.author}`;
 
   return (
     <div className="relative max-w-xl mx-auto p-6 pt-12 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition text-center font-serif">
-      {/* ❤️ Save button */}
+      
+      {/* ✅ Favorite Toggle Button (Top Right) */}
       <button
         onClick={onSave}
         className="absolute top-3 right-4 text-red-500 hover:text-red-700 transition"
@@ -59,6 +66,7 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
         )}
       </button>
 
+      {/* ✅ Quote Text (Animated) */}
       <p className="text-xl italic mb-4 min-h-[100px]">
         "
         {showText && (
@@ -67,6 +75,7 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
         "
       </p>
 
+      {/* ✅ Tags */}
       {quote.tags && quote.tags.length > 0 && (
         <div className="flex justify-center gap-2 mb-2 flex-wrap">
           {quote.tags.map((tag, i) => (
@@ -80,6 +89,7 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
         </div>
       )}
 
+      {/* ✅ Author */}
       <p
         className={`font-semibold mb-6 ${
           showText ? "opacity-100" : "opacity-0 transition-opacity duration-500"
@@ -88,9 +98,10 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
         — {quote.author}
       </p>
 
-      {/* Button row (bottom right) */}
+      {/* ✅ Action Buttons (Bottom Right) */}
       <div className="flex justify-end gap-2 mt-4">
-        {/* Copy to Clipboard */}
+
+        {/* ✅ Copy to Clipboard */}
         <Tooltip title="Copy to Clipboard">
           <IconButton
             onClick={() => {
@@ -104,13 +115,14 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
           </IconButton>
         </Tooltip>
 
-        {/* Share Menu */}
+        {/* ✅ Share Button (opens menu) */}
         <Tooltip title="Share">
           <IconButton onClick={handleMenuOpen} size="small">
             <ShareIcon fontSize="small" />
           </IconButton>
         </Tooltip>
 
+        {/* ✅ Share Menu */}
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
           <MenuItem
             onClick={() => {
@@ -125,9 +137,7 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
 
           <MenuItem
             onClick={() => {
-              const x = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                quoteText
-              )}`;
+              const x = `https://twitter.com/intent/tweet?text=${encodeURIComponent(quoteText)}`;
               window.open(x, "_blank");
               handleMenuClose();
             }}
@@ -143,13 +153,13 @@ export const QuoteCard = ({ quote, onSave, isSaved }: Props) => {
               handleMenuClose();
             }}
           >
-            <WhatsAppIcon fontSize="small" style={{ marginRight: 8 }} className="text-green-600"/>
+            <WhatsAppIcon fontSize="small" style={{ marginRight: 8 }} className="text-green-600" />
             WhatsApp
           </MenuItem>
         </Menu>
       </div>
 
-      {/* Copied feedback */}
+      {/* ✅ Copied feedback label */}
       {copied && (
         <span className="absolute -top-6 right-4 text-xs text-green-600 font-medium bg-white px-2 py-0.5 rounded shadow">
           Copied!

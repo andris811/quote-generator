@@ -1,3 +1,4 @@
+// ✅ Imports
 import { useEffect, useMemo, useState } from "react";
 import { Quote } from "../types/Quote";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -23,12 +24,14 @@ import {
   Tooltip,
 } from "@mui/material";
 
+// ✅ Component Props
 type Props = {
   quotes: Quote[];
   onRemove: (id: string | number) => void;
 };
 
 export const Favorites = ({ quotes, onRemove }: Props) => {
+  // ✅ State
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
     const saved = localStorage.getItem("pinnedQuotes");
@@ -45,8 +48,10 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [quoteToDelete, setQuoteToDelete] = useState<Quote | null>(null);
 
+  // ✅ Share menu open state
   const open = Boolean(anchorEl);
 
+  // ✅ Handle share menu open
   const handleShareClick = (
     event: React.MouseEvent<HTMLElement>,
     quote: Quote
@@ -55,17 +60,20 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
     setShareQuote(quote);
   };
 
+  // ✅ Close share menu
   const handleShareClose = () => {
     setAnchorEl(null);
     setShareQuote(null);
   };
 
+  // ✅ Extract unique tags for filter buttons
   const allTags = useMemo(() => {
     const tags = new Set<string>();
     quotes.forEach((q) => q.tags?.forEach((t) => tags.add(t)));
     return Array.from(tags);
   }, [quotes]);
 
+  // ✅ Sort and filter favorites based on tag and pin status
   const sortedQuotes = useMemo(() => {
     const list = activeTag
       ? quotes.filter((q) => q.tags?.includes(activeTag))
@@ -80,11 +88,13 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* ✅ Header */}
       <div className="flex items-center gap-2 text-2xl font-bold text-gray-700 mb-4">
         <BookmarksIcon className="text-gray-500" />
         Saved Quotes
       </div>
 
+      {/* ✅ Tag Filter Bar */}
       {allTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {allTags.map((tag) => (
@@ -103,6 +113,7 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
         </div>
       )}
 
+      {/* ✅ Quote Card Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedQuotes.map((q) => {
           const isPinned = pinnedIds.includes(String(q.id));
@@ -114,8 +125,10 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 isPinned ? "bg-blue-50" : "bg-white"
               }`}
             >
+              {/* ✅ Quote text */}
               <p className="italic mb-2 text-gray-800">"{q.content}"</p>
 
+              {/* ✅ Tags */}
               {Array.isArray(q.tags) && q.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-1">
                   {q.tags.map((tag, i) => (
@@ -136,11 +149,12 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 </div>
               )}
 
+              {/* ✅ Author */}
               <p className="text-right font-semibold text-gray-600">
                 — {q.author}
               </p>
 
-              {/* Left: Delete & Pin */}
+              {/* ✅ Left Buttons: Delete / Pin */}
               <div className="absolute bottom-2 left-2 flex items-center gap-2">
                 <Tooltip title="Delete">
                   <IconButton
@@ -181,10 +195,7 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                     size="small"
                   >
                     {isPinned ? (
-                      <PushPinIcon
-                        fontSize="small"
-                        className="text-yellow-600"
-                      />
+                      <PushPinIcon fontSize="small" className="text-yellow-600" />
                     ) : (
                       <PushPinOutlinedIcon
                         fontSize="small"
@@ -195,7 +206,7 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
                 </Tooltip>
               </div>
 
-              {/* Right: Copy & Share */}
+              {/* ✅ Right Buttons: Copy / Share */}
               <div className="absolute bottom-2 right-2 flex items-center gap-2">
                 <Tooltip title="Copy to Clipboard">
                   <IconButton
@@ -238,6 +249,7 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
         })}
       </div>
 
+      {/* ✅ Share Menu */}
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -270,7 +282,8 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
             handleShareClose();
           }}
         >
-          <TwitterIcon fontSize="small" className="mr-2" />X
+          <TwitterIcon fontSize="small" className="mr-2" />
+          X
         </MenuItem>
 
         <MenuItem
@@ -289,6 +302,7 @@ export const Favorites = ({ quotes, onRemove }: Props) => {
         </MenuItem>
       </Menu>
 
+      {/* ✅ Delete Confirmation Dialog */}
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
